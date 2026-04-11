@@ -1,6 +1,6 @@
 ---
 title: "Besides Historical Returns"
-date: 2026-04-11 12:00:00 +0200
+date: 2026-04-11 12:41:00 +0200
 description: "Beyond historical returns: a multidimensional framework for expected returns across asset classes, strategy styles, and risk factors. Based on Anti Ilmanen"
 tags: [analysis, finance, expected-returns]
 categories: [Finance, Expected Returns]
