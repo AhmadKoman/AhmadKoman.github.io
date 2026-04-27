@@ -7,7 +7,6 @@ categories: [Finance, Commodities, Trading Strategies]
 math: true
 media_subpath: /assets/img/posts/bottom_up_corn/
 ---
-# A Bottom Up Fair Value Model for Corn Futures
 
 
 
