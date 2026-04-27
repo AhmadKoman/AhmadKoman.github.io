@@ -3,7 +3,10 @@ r"""
 Rewrite `_posts/2026-04-27-bottom-up-corn.md` prose around single-line display math.
 
 Goal: reduce the repetitive “sentence ending with ':' then a $$ block” rhythm by folding
-short, single-line formulas into the preceding paragraph as inline math \( ... \).
+short, single-line formulas into the preceding paragraph as inline math $ ... $.
+
+Note: Kramdown strips ``\\( ... \\)`` into plain parentheses, so MathJax never sees TeX.
+Use dollar delimiters (supported by Chirpy's MathJax config) instead.
 
 This script is intentionally conservative:
 - Never touches multi-line display equations (matrices, pipelines, etc.).
@@ -48,7 +51,7 @@ def fold_sentence(sentence: str, tex: str) -> str:
     low = tail_strip.lower().rstrip(".,;:")
     tex_strip = tex.strip()
 
-    inline = f"\\( {tex_strip} \\)"
+    inline = f"$ {tex_strip} $"
 
     base_for_join = tail_strip
 
@@ -59,7 +62,7 @@ def fold_sentence(sentence: str, tex: str) -> str:
         """
         Prefer em dashes for definitional sentences that used to end with ':'.
 
-        This avoids the repetitive "... is, \\( ... \\)." rhythm.
+        This avoids the repetitive "... is, $ ... $." rhythm.
         """
         base_trim = base_for_join.rstrip().rstrip(",")
 
@@ -307,7 +310,7 @@ def fold_sentence(sentence: str, tex: str) -> str:
         stem = base_for_join[: -len(" tightness signal")].rstrip()
         return f"{stem} tightness signal {inline}"
 
-    # Avoid "... verb, \\( ... \\)." when the verb wants a direct object without a comma.
+    # Avoid "... verb, $ ... $." when the verb wants a direct object without a comma.
     if low.endswith(" was"):
         stem = base_for_join[: -len(" was")].rstrip()
         return f"{stem} was {inline}."
