@@ -2,7 +2,7 @@
 title: "CBOT Corn Futures Strategy: A Bottom Up Factor Framework"
 date: 2026-04-27 18:00:00 +0200
 description: "From the physical corn balance sheet to standardized economic factors, contract level fair value, mispricing scores, spread trades, and risk controlled execution."
-tags: [analysis, finance, commodities, corn, futures, "factor models", quantconnect]
+tags: [projects, analysis, finance, commodities, corn, futures, "factor models", quantconnect]
 categories: [Finance, Commodities, Trading Strategies]
 math: true
 media_subpath: /assets/img/posts/bottom_up_corn/
