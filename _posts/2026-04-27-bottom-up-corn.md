@@ -9,9 +9,7 @@ media_subpath: /assets/img/posts/bottom_up_corn/
 ---
 
 
-
-
-What should a corn futures contract be worth?
+# What should a corn futures contract be worth?
 
 A simple answer would look only at the price chart and try to predict the next move from past returns. Or one could think of the process and realise corn futures are not just financial time series. They are contracts linked to a physical commodity that must be planted, grown, harvested, stored, consumed, exported, processed, fed to livestock, and sometimes delivered against a specific futures month.
 
@@ -59,13 +57,7 @@ State estimation produces a real time view of the corn balance sheet. Price tran
 
 A bottom up strategy is possible only when the physical market state is observable enough to model. Corn is a strong candidate because the United States corn market has a structured information cycle. Relevant information arrives through balance sheets, crop progress reports, planting reports, acreage reports, grain stocks, export sales, export inspections, ethanol production, positioning reports, and futures settlements.
 
-The timing of this information is as important as the information itself. A data point can enter the model only after it was knowable. A final revised value cannot be used as if it had been known historically. Therefore, the state variable at date
-
-$$
-t
-$$
-
-is not the final historical database, but the information set available at that time:
+The timing of this information is as important as the information itself. A data point can enter the model only after it was knowable. A final revised value cannot be used as if it had been known historically. Therefore, the state variable at date \(t\) is not the final historical database, but the information set available at that time:
 
 $$
 x_t = \text{market information knowable at date } t.
@@ -79,168 +71,66 @@ A futures contract is not a generic corn price. It is a claim on deliverable cor
 
 The first layer is the physical balance sheet: if supply is tight and demand is strong, corn should be more valuable. The second layer is storage economics: because corn can be stored, prices across the curve reflect the cost and benefit of holding inventory through time. The third layer is contract timing: nearby and deferred contracts can react differently to the same fundamental information because they represent different delivery windows.
 
-For this reason, the model estimates a contract specific fair value:
+For this reason, the model estimates a contract specific fair value, \(\text{FairValue}_{t,k}\).
 
-$$
-\text{FairValue}_{t,k}.
-$$
-
-Here,
-
-$$
-t
-$$
-
-is the date and
-
-$$
-k
-$$
-
-is the futures contract. The strategy is not asking whether corn is mispriced in general. It is asking whether contract
-
-$$
-k
-$$
-
-on date
-
-$$
-t
-$$
-
-is mispriced relative to the physical state known at date
-
-$$
-t.
-$$
+Here, \(t\) is the date and \(k\) is the futures contract. The strategy is not asking whether corn is mispriced in general. It is asking whether contract \(k\) on date \(t\) is mispriced relative to the physical state known at date \(t\).
 
 ## Storage economics
 
 The futures curve is shaped by the economics of storing corn. Holding physical corn involves financing, storage, handling, and delivery costs. It can also provide a benefit: when inventory is scarce, owning corn provides flexibility and security. This non cash benefit is called convenience yield.
 
-Let the financing rate at date
-
-$$
-t
-$$
-
-be
-
-$$
-r_t,
-$$
-
-the storage cost be
-
-$$
-c_t,
-$$
-
-and the convenience yield be
-
-$$
-y_t.
-$$
+Let the financing rate at date \(t\) be \(r_t\), the storage cost be \(c_t\), and the convenience yield be \(y_t\).
 
 The cost side of carry is financing plus storage, while the benefit side is convenience yield. The net carry rate is therefore
 
 $$
-\text{NetCarry}_t = r_t + c_t − y_t.
+\text{NetCarry}_t = r_t + c_t - y_t.
 $$
 
 A positive net carry means deferred corn should be more expensive than nearby corn because carrying inventory is costly. A lower or negative net carry means nearby corn can become relatively more valuable because physical scarcity raises convenience yield.
 
-If corn is carried from date
-
-$$
-t
-$$
-
-to maturity
-
-$$
-T,
-$$
-
-the carry period is
-
-$$
-T − t.
-$$
+If corn is carried from date \(t\) to maturity \(T\), the carry period is \(T - t\).
 
 With continuous compounding, the carry multiplier is
 
 $$
-\exp\left(\text{NetCarry}_t(T − t)\right).
+\exp\left(\text{NetCarry}_t(T - t)\right).
 $$
 
 Substituting the economic components of net carry gives
 
 $$
-\exp\left((r_t + c_t − y_t)(T − t)\right).
+\exp\left((r_t + c_t - y_t)(T - t)\right).
 $$
 
-A futures price for maturity
+A futures price for maturity \(T\) can therefore be approximated by applying the carry multiplier to the current spot or nearby reference value \(S_t\):
 
 $$
-T
-$$
-
-can therefore be approximated by applying the carry multiplier to the current spot or nearby reference value
-
-$$
-S_t:
-$$
-
-$$
-F_{t,T} \approx S_t \exp\left((r_t + c_t − y_t)(T − t)\right).
+F_{t,T} \approx S_t \exp\left((r_t + c_t - y_t)(T - t)\right).
 $$
 
 The fitted pricing model later works in log prices. This is natural because the storage relation is multiplicative in price levels, and a multiplicative relation becomes additive after taking logarithms:
 
 $$
-\ln(F_{t,T}) \approx \ln(S_t) + (r_t + c_t − y_t)(T − t).
+\ln(F_{t,T}) \approx \ln(S_t) + (r_t + c_t - y_t)(T - t).
 $$
 
 Moving the nearby log price to the left isolates the log spread between deferred and nearby value:
 
 $$
-\ln(F_{t,T}) − \ln(S_t) \approx (r_t + c_t − y_t)(T − t).
+\ln(F_{t,T}) - \ln(S_t) \approx (r_t + c_t - y_t)(T - t).
 $$
 
 This is the first reason calendar spreads matter. They are not cosmetic. They are market prices for time, storage, financing, delivery timing, and scarcity.
 
 ## Calendar spreads
 
-A calendar spread compares the value of one delivery month with another. Let
-
-$$
-n
-$$
-
-be the near contract and
-
-$$
-f
-$$
-
-be the farther contract. The observed market prices are
-
-$$
-F^{\text{market}}_{t,n}
-$$
-
-and
-
-$$
-F^{\text{market}}_{t,f}.
-$$
+A calendar spread compares the value of one delivery month with another. Let \(n\) be the near contract and \(f\) be the farther contract. The observed market prices are \(F^{\text{market}}_{t,n}\) and \(F^{\text{market}}_{t,f}\).
 
 The market spread is defined as
 
 $$
-\text{MarketSpread}_t = F^{\text{market}}_{t,n} − F^{\text{market}}_{t,f}.
+\text{MarketSpread}_t = F^{\text{market}}_{t,n} - F^{\text{market}}_{t,f}.
 $$
 
 The economic logic comes from storage. When inventory is abundant, the far contract can trade above the near contract because holding corn requires financing and storage. When inventory is scarce, the near contract can become expensive because the convenience yield of owning nearby physical corn rises.
@@ -248,7 +138,7 @@ The economic logic comes from storage. When inventory is abundant, the far contr
 The storage intuition can be summarized as
 
 $$
-\text{Deferred} − \text{Nearby} \approx \text{Financing Cost} + \text{Storage Cost} + \text{Delivery Carry} − \text{Scarcity Premium}.
+\text{Deferred} - \text{Nearby} \approx \text{Financing Cost} + \text{Storage Cost} + \text{Delivery Carry} - \text{Scarcity Premium}.
 $$
 
 As the scarcity premium rises, the right side falls. Deferred corn becomes less expensive relative to nearby corn, or equivalently, nearby corn becomes expensive relative to deferred corn.
@@ -272,13 +162,13 @@ $$
 Ending stocks are what remains after total use is subtracted from total supply:
 
 $$
-\text{EndingStocks}_t = \text{TotalSupply}_t − \text{TotalUse}_t.
+\text{EndingStocks}_t = \text{TotalSupply}_t - \text{TotalUse}_t.
 $$
 
 Substituting the supply and use components gives the full balance sheet relation:
 
 $$
-\text{EndingStocks}_t = \text{BeginningStocks}_t + \text{Production}_t + \text{Imports}_t − \text{Exports}_t − \text{EthanolUse}_t − \text{OtherFSI}_t − \text{FeedResidual}_t.
+\text{EndingStocks}_t = \text{BeginningStocks}_t + \text{Production}_t + \text{Imports}_t - \text{Exports}_t - \text{EthanolUse}_t - \text{OtherFSI}_t - \text{FeedResidual}_t.
 $$
 
 This identity is not optional. Any internally consistent corn model must respect it.
@@ -315,11 +205,7 @@ These signs are not fitted coefficients yet. They are economic sign restrictions
 
 ## The market state vector
 
-The model needs a compact representation of what is known about the corn market at date
-
-$$
-t.
-$$
+The model needs a compact representation of what is known about the corn market at date \(t\).
 
 That state must include supply variables, demand variables, inventory variables, positioning variables, seasonal variables, and risk variables. The natural object is the vector
 
@@ -405,7 +291,7 @@ $$
 The trading relevant yield quantity is the difference between model yield and trend or prior yield:
 
 $$
-\text{YieldDeviation}_t = \text{ModelYield}_t − \text{TrendOrPriorYield}_t.
+\text{YieldDeviation}_t = \text{ModelYield}_t - \text{TrendOrPriorYield}_t.
 $$
 
 A positive yield deviation means the model sees more yield than expected. More yield implies more production, which is bearish. A negative yield deviation means the model sees less yield than expected, which is bullish.
@@ -423,7 +309,7 @@ This identity keeps the balance sheet internally consistent. If the model change
 The production surprise is measured against the prior production estimate. The model estimate minus the prior gives the production revision:
 
 $$
-\text{ProductionRevision}_t = \text{ModelProduction}_t − \text{PriorProduction}_t.
+\text{ProductionRevision}_t = \text{ModelProduction}_t - \text{PriorProduction}_t.
 $$
 
 A positive production revision means expected supply has increased, which is bearish. A negative production revision means expected supply has decreased, which is bullish.
@@ -482,13 +368,7 @@ $$
 
 ## Economic signing
 
-For any raw variable
-
-$$
-x_t,
-$$
-
-the model first determines its economic direction. If a higher value is bullish, the signed signal keeps the raw sign:
+For any raw variable \(x_t\), the model first determines its economic direction. If a higher value is bullish, the signed signal keeps the raw sign:
 
 $$
 s_t = x_t.
@@ -497,7 +377,7 @@ $$
 If a higher value is bearish, the signed signal flips the raw sign:
 
 $$
-s_t = −x_t.
+s_t = -x_t.
 $$
 
 This step makes all signals point in the same economic direction. After signing, a larger value should always mean more bullish pressure, more tightness, or stronger demand.
@@ -506,49 +386,27 @@ This step makes all signals point in the same economic direction. After signing,
 
 After signing, the model compares today’s signal with its own history. The comparison must not use today’s value to define today’s mean or standard deviation; otherwise, the current signal would partially normalize itself.
 
-For a window of length
-
-$$
-W,
-$$
-
-the model uses only observations from
-
-$$
-t − W
-$$
-
-through
-
-$$
-t − 1.
-$$
+For a window of length \(W\), the model uses only observations from \(t - W\) through \(t - 1\).
 
 The lagged rolling mean is
 
 $$
-\mu^{(W)}_{t−1} = \frac{1}{W}\sum_{i=t−W}^{t−1}s_i.
+\mu^{(W)}_{t-1} = \frac{1}{W}\sum_{i=t-W}^{t-1}s_i.
 $$
 
 The lagged rolling standard deviation is
 
 $$
-\sigma^{(W)}_{t−1} = \sqrt{\frac{1}{W−1}\sum_{i=t−W}^{t−1}\left(s_i − \mu^{(W)}_{t−1}\right)^2}.
+\sigma^{(W)}_{t-1} = \sqrt{\frac{1}{W-1}\sum_{i=t-W}^{t-1}\left(s_i - \mu^{(W)}_{t-1}\right)^2}.
 $$
 
 The standardized signal measures how far today’s signed signal is from its lagged historical mean in units of lagged historical standard deviation:
 
 $$
-z_t = \frac{s_t − \mu^{(W)}_{t−1}}{\sigma^{(W)}_{t−1}}.
+z_t = \frac{s_t - \mu^{(W)}_{t-1}}{\sigma^{(W)}_{t-1}}.
 $$
 
-Because the sign was chosen before standardization, a positive
-
-$$
-z_t
-$$
-
-means the economically signed signal is above normal.
+Because the sign was chosen before standardization, a positive \(z_t\) means the economically signed signal is above normal.
 
 ## Supply factor
 
@@ -563,73 +421,73 @@ For each supply component, the model compares a prior estimate with an updated e
 For production, the tightness signal is prior production minus model production:
 
 $$
-s^{\text{prod}}_t = \text{PriorProduction}_t − \text{ModelProduction}_t.
+s^{\text{prod}}_t = \text{PriorProduction}_t - \text{ModelProduction}_t.
 $$
 
 Equivalently, first define the production revision:
 
 $$
-\text{ProductionRevision}_t = \text{ModelProduction}_t − \text{PriorProduction}_t.
+\text{ProductionRevision}_t = \text{ModelProduction}_t - \text{PriorProduction}_t.
 $$
 
 Because a positive production revision is bearish, the bullish tightness signal is the negative of the revision:
 
 $$
-s^{\text{prod}}_t = −\text{ProductionRevision}_t.
+s^{\text{prod}}_t = -\text{ProductionRevision}_t.
 $$
 
 Planted acres define the potential production base. If the model estimates fewer planted acres than the prior, potential supply is smaller and the signal is bullish:
 
 $$
-s^{\text{acreage}}_t = \text{PriorPlantedAcres}_t − \text{ModelPlantedAcres}_t.
+s^{\text{acreage}}_t = \text{PriorPlantedAcres}_t - \text{ModelPlantedAcres}_t.
 $$
 
 The raw acreage surprise is
 
 $$
-\text{AcreageSurprise}_t = \text{ModelPlantedAcres}_t − \text{PriorPlantedAcres}_t.
+\text{AcreageSurprise}_t = \text{ModelPlantedAcres}_t - \text{PriorPlantedAcres}_t.
 $$
 
 Since a positive acreage surprise means more potential supply, the signed tightness signal is
 
 $$
-s^{\text{acreage}}_t = −\text{AcreageSurprise}_t.
+s^{\text{acreage}}_t = -\text{AcreageSurprise}_t.
 $$
 
 Harvested acres are closer to production than planted acres because they represent the acres that actually contribute grain. If the model estimates fewer harvested acres than the prior, expected grain supply is smaller and the signal is bullish:
 
 $$
-s^{\text{harvested}}_t = \text{PriorHarvestedAcres}_t − \text{ModelHarvestedAcres}_t.
+s^{\text{harvested}}_t = \text{PriorHarvestedAcres}_t - \text{ModelHarvestedAcres}_t.
 $$
 
 The raw harvested acreage surprise is
 
 $$
-\text{HarvestedAcreageSurprise}_t = \text{ModelHarvestedAcres}_t − \text{PriorHarvestedAcres}_t.
+\text{HarvestedAcreageSurprise}_t = \text{ModelHarvestedAcres}_t - \text{PriorHarvestedAcres}_t.
 $$
 
 Since a positive harvested acreage surprise increases expected supply, the signed tightness signal is
 
 $$
-s^{\text{harvested}}_t = −\text{HarvestedAcreageSurprise}_t.
+s^{\text{harvested}}_t = -\text{HarvestedAcreageSurprise}_t.
 $$
 
 Yield is measured relative to trend or prior expectation. If model yield is below the expected yield level, production falls and the signal is bullish:
 
 $$
-s^{\text{yield}}_t = \text{TrendOrPriorYield}_t − \text{ModelYield}_t.
+s^{\text{yield}}_t = \text{TrendOrPriorYield}_t - \text{ModelYield}_t.
 $$
 
 The raw yield deviation is
 
 $$
-\text{YieldDeviation}_t = \text{ModelYield}_t − \text{TrendOrPriorYield}_t.
+\text{YieldDeviation}_t = \text{ModelYield}_t - \text{TrendOrPriorYield}_t.
 $$
 
 Since a positive yield deviation means more supply, the signed tightness signal is
 
 $$
-s^{\text{yield}}_t = −\text{YieldDeviation}_t.
+s^{\text{yield}}_t = -\text{YieldDeviation}_t.
 $$
 
 At this stage, every supply signal has the same direction: a positive value means tighter supply than expected. Because the four signals still have different units, each one is standardized with the lagged rolling transformation:
@@ -665,25 +523,25 @@ The balance factor answers:
 The most compact tightness variable is stocks to use. Higher stocks to use means more inventory cushion relative to demand, which is bearish. The signed stocks to use signal must therefore rise when stocks to use falls:
 
 $$
-s^{\text{stu}}_t = −\text{StocksToUse}_t.
+s^{\text{stu}}_t = -\text{StocksToUse}_t.
 $$
 
 Markets also react to changes in the balance sheet. If stocks to use is revised downward, the market is becoming tighter relative to the previous estimate. If it is revised upward, the market is becoming looser. The change in stocks to use is
 
 $$
-\Delta \text{StocksToUse}_t = \text{StocksToUse}_t − \text{StocksToUse}_{t−1}.
+\Delta \text{StocksToUse}_t = \text{StocksToUse}_t - \text{StocksToUse}_{t-1}.
 $$
 
 Because a positive change means loosening, the signed revision signal is
 
 $$
-s^{\text{revision}}_t = −\Delta \text{StocksToUse}_t.
+s^{\text{revision}}_t = -\Delta \text{StocksToUse}_t.
 $$
 
 Ending stocks also matter as an inventory level. Higher ending stocks mean more remaining supply, which is bearish. The signed ending stocks signal is
 
 $$
-s^{\text{ending}}_t = −\text{EndingStocks}_t.
+s^{\text{ending}}_t = -\text{EndingStocks}_t.
 $$
 
 Each signed balance signal is standardized:
@@ -706,11 +564,7 @@ The demand factor answers:
 
 > Is corn use stronger or weaker than expected?
 
-Demand is bullish when it is stronger than expected because higher use reduces ending stocks. Exports are measured against the seasonal path that would normally be expected by date
-
-$$
-t.
-$$
+Demand is bullish when it is stronger than expected because higher use reduces ending stocks. Exports are measured against the seasonal path that would normally be expected by date \(t\).
 
 If accumulated exports are above the seasonal expectation, exports are running strong.
 
@@ -723,25 +577,25 @@ $$
 A value of one means exports are exactly on pace. To express the gap around zero, subtract one:
 
 $$
-\text{ExportPaceGap}_t = \frac{\text{AccumulatedExports}_t}{\text{SeasonalExpectedExports}_t} − 1.
+\text{ExportPaceGap}_t = \frac{\text{AccumulatedExports}_t}{\text{SeasonalExpectedExports}_t} - 1.
 $$
 
 Ethanol use is compared with expected seasonal ethanol output. The gap is current weekly output minus the seasonal expectation:
 
 $$
-\text{EthanolUseGap}_t = \text{WeeklyEthanolOutput}_t − \text{SeasonalExpectedEthanolOutput}_t.
+\text{EthanolUseGap}_t = \text{WeeklyEthanolOutput}_t - \text{SeasonalExpectedEthanolOutput}_t.
 $$
 
 Feed and residual is measured as the model estimate relative to its prior:
 
 $$
-\text{FeedResidualGap}_t = \text{ModelFeedResidual}_t − \text{PriorFeedResidual}_t.
+\text{FeedResidualGap}_t = \text{ModelFeedResidual}_t - \text{PriorFeedResidual}_t.
 $$
 
 Total use is also measured relative to its prior:
 
 $$
-\text{TotalUseGap}_t = \text{ModelTotalUse}_t − \text{PriorTotalUse}_t.
+\text{TotalUseGap}_t = \text{ModelTotalUse}_t - \text{PriorTotalUse}_t.
 $$
 
 All four demand gaps are already bullish when positive. Stronger exports, stronger ethanol use, stronger feed use, and stronger total use all tighten the balance sheet.
@@ -770,11 +624,7 @@ The positioning factor answers:
 
 > Is speculative flow supportive or vulnerable?
 
-Let managed money net positioning be
-
-$$
-MM_t = \text{ManagedMoneyNetPosition}_t.
-$$
+Let managed money net positioning be \(MM_t = \text{ManagedMoneyNetPosition}_t\).
 
 The first signal is the level of managed money positioning. A high level means speculative money is already long, while a low or negative level means speculative money is short:
 
@@ -785,7 +635,7 @@ $$
 The second signal is the change in managed money positioning. If managed money is increasing its net position, speculative flow is moving into corn. If it is decreasing, speculative flow is moving out:
 
 $$
-s^{\text{change}}_t = MM_t − MM_{t−1}.
+s^{\text{change}}_t = MM_t - MM_{t-1}.
 $$
 
 Both signals are standardized:
@@ -814,31 +664,9 @@ This separates bullish or bearish positioning from the risk that the position ha
 
 Corn has a crop calendar, and the economic importance of information changes across the year. Planting information matters most during planting. Weather and pollination matter most during the yield formation window. Harvest information matters during harvest. Demand and stock information become more important after harvest.
 
-The calendar is cyclical rather than linear. The last day of the marketing year is close to the first day of the next marketing year, but a raw day number makes day
+The calendar is cyclical rather than linear. The last day of the marketing year is close to the first day of the next marketing year, but a raw day number makes day \(365\) and day \(1\) look far apart. The model therefore represents the marketing year day as a point on a circle.
 
-$$
-365
-$$
-
-and day
-
-$$
-1
-$$
-
-look far apart. The model therefore represents the marketing year day as a point on a circle.
-
-Let the marketing year day at date
-
-$$
-t
-$$
-
-be
-
-$$
-\text{MYDay}_t \in \{1,2,\ldots,365\}.
-$$
+Let the marketing year day at date \(t\) be \(\text{MYDay}_t \in \{1,2,\ldots,365\}\).
 
 First convert the day into a fraction of the annual cycle:
 
@@ -846,29 +674,13 @@ $$
 u_t = \frac{\text{MYDay}_t}{365}.
 $$
 
-A full circle has
-
-$$
-2\pi
-$$
-
-radians, so the fraction of the marketing year is converted into an angle by multiplying by
-
-$$
-2\pi:
-$$
+A full circle has \(2\pi\) radians, so the fraction of the marketing year is converted into an angle by multiplying by \(2\pi\):
 
 $$
 \theta_t = 2\pi u_t.
 $$
 
-Substituting the definition of
-
-$$
-u_t
-$$
-
-gives the crop calendar angle:
+Substituting the definition of \(u_t\) gives the crop calendar angle:
 
 $$
 \theta_t = 2\pi\frac{\text{MYDay}_t}{365}.
@@ -919,50 +731,40 @@ The physical balance sheet may point in one direction, but the reliability of a 
 The risk factor begins with daily log returns. A log return compares today’s price with yesterday’s price in logarithmic space:
 
 $$
-r_t = \ln(F_t) − \ln(F_{t−1}).
+r_t = \ln(F_t) - \ln(F_{t-1}).
 $$
 
 Momentum measures whether the market has recently moved up or down. A twenty day momentum signal compares the current log price with the log price twenty trading days earlier:
 
 $$
-\text{Momentum}_{20,t} = \ln(F_t) − \ln(F_{t−20}).
+\text{Momentum}_{20,t} = \ln(F_t) - \ln(F_{t-20}).
 $$
 
-Volatility measures how large recent returns have been. The model squares each recent daily return, averages those squared returns over twenty days, annualizes with
+Volatility measures how large recent returns have been. The model squares each recent daily return, averages those squared returns over twenty days, annualizes with \(252\) trading days, and takes the square root to return to volatility units:
 
 $$
-252
-$$
-
-trading days, and takes the square root to return to volatility units:
-
-$$
-\text{RV}_{20,t} = \sqrt{252 \cdot \frac{1}{20}\sum_{i=t−19}^{t}r_i^2}.
+\text{RV}_{20,t} = \sqrt{252 \cdot \frac{1}{20}\sum_{i=t-19}^{t}r_i^2}.
 $$
 
 A return shock measures whether today’s return is unusual relative to recent returns. The recent mean is computed using only earlier returns:
 
 $$
-\mu^{(20)}_{r,t−1} = \frac{1}{20}\sum_{i=t−20}^{t−1}r_i.
+\mu^{(20)}_{r,t-1} = \frac{1}{20}\sum_{i=t-20}^{t-1}r_i.
 $$
 
 The recent return standard deviation is also computed using only earlier returns:
 
 $$
-\sigma^{(20)}_{r,t−1} = \sqrt{\frac{1}{19}\sum_{i=t−20}^{t−1}\left(r_i − \mu^{(20)}_{r,t−1}\right)^2}.
+\sigma^{(20)}_{r,t-1} = \sqrt{\frac{1}{19}\sum_{i=t-20}^{t-1}\left(r_i - \mu^{(20)}_{r,t-1}\right)^2}.
 $$
 
 The shock score is today’s return minus the lagged recent mean, divided by the lagged recent standard deviation:
 
 $$
-\text{Shock}_t = \frac{r_t − \mu^{(20)}_{r,t−1}}{\sigma^{(20)}_{r,t−1}}.
+\text{Shock}_t = \frac{r_t - \mu^{(20)}_{r,t-1}}{\sigma^{(20)}_{r,t-1}}.
 $$
 
-Momentum, realized volatility, and shock are then standardized into
-
-$$
-z^{\text{mom}}_t, \qquad z^{\text{vol}}_t, \qquad z^{\text{shock}}_t.
-$$
+Momentum, realized volatility, and shock are then standardized into \(z^{\text{mom}}_t\), \(z^{\text{vol}}_t\), and \(z^{\text{shock}}_t\).
 
 Momentum receives the largest weight because trend can strongly affect residual behavior. Volatility receives a large weight because uncertainty changes how aggressive the model should be. Shock receives a smaller weight because it captures abnormal one day instability.
 
@@ -1008,29 +810,11 @@ The second check is whether the factors are too correlated. Some correlation is 
 
 ## Contract level pricing
 
-A single corn price is not enough. The futures chain contains multiple contracts,
+A single corn price is not enough. The futures chain contains multiple contracts, \(k = 1,2,\ldots,K\).
 
-$$
-k = 1,2,\ldots,K.
-$$
+Each contract has its own expiry, delivery month, curve depth, and exposure to old crop or new crop fundamentals. The model therefore prices contract \(k\) at date \(t\).
 
-Each contract has its own expiry, delivery month, curve depth, and exposure to old crop or new crop fundamentals. The model therefore prices contract
-
-$$
-k
-$$
-
-at date
-
-$$
-t.
-$$
-
-The observed market price is
-
-$$
-F_{t,k}.
-$$
+The observed market price is \(F_{t,k}\).
 
 The model works in log price because proportional deviations are more stable than raw price deviations, and because storage economics becomes additive in logs. The pricing target is
 
@@ -1083,31 +867,9 @@ $$
 
 ## Delivery month encoding
 
-Delivery months are cyclical in the same way that crop year days are cyclical. A raw month number treats January as
+Delivery months are cyclical in the same way that crop year days are cyclical. A raw month number treats January as \(1\) and December as \(12\), which incorrectly makes December and January look far apart even though they are adjacent in calendar time.
 
-$$
-1
-$$
-
-and December as
-
-$$
-12,
-$$
-
-which incorrectly makes December and January look far apart even though they are adjacent in calendar time.
-
-Let the delivery month of contract
-
-$$
-k
-$$
-
-be
-
-$$
-m_k \in \{1,2,\ldots,12\}.
-$$
+Let the delivery month of contract \(k\) be \(m_k \in \{1,2,\ldots,12\}\).
 
 Convert the month into a fraction of the annual cycle:
 
@@ -1157,11 +919,7 @@ The expression inside the sine and cosine is the angular location of the deliver
 
 The same factor should not be forced to have the same price impact on every contract. A supply shock can affect a new crop December contract differently from an old crop July contract. Balance tightness can matter more for nearby contracts when old crop inventory is scarce. Seasonality can matter differently depending on delivery month and days to expiry.
 
-Interaction terms let the model estimate contract specific sensitivities. Start with a direct supply effect. If supply tightness increases, log price may change by a coefficient
-
-$$
-\beta_S:
-$$
+Interaction terms let the model estimate contract specific sensitivities. Start with a direct supply effect. If supply tightness increases, log price may change by a coefficient \(\beta_S\):
 
 $$
 \beta_S\text{SupplyFactor}_t.
@@ -1185,13 +943,7 @@ $$
 \left(\beta_S + \theta_S\text{DTE}_{t,k}\right)\text{SupplyFactor}_t.
 $$
 
-The effective sensitivity of contract
-
-$$
-k
-$$
-
-to supply tightness is therefore
+The effective sensitivity of contract \(k\) to supply tightness is therefore
 
 $$
 \frac{\partial \ln(F_{t,k})}{\partial \text{SupplyFactor}_t} = \beta_S + \theta_S\text{DTE}_{t,k}.
@@ -1235,41 +987,7 @@ The model can now learn that the same balance sheet tightness has different effe
 
 The model maps the contract level feature vector into log price. The simplest linear structure starts with an intercept, adds the weighted feature vector, and leaves an unexplained residual.
 
-For contract
-
-$$
-k
-$$
-
-on date
-
-$$
-t,
-$$
-
-the log price target is
-
-$$
-y_{t,k},
-$$
-
-the feature vector is
-
-$$
-X_{t,k},
-$$
-
-the coefficient vector is
-
-$$
-\beta_t,
-$$
-
-and the residual is
-
-$$
-\varepsilon_{t,k}.
-$$
+For contract \(k\) on date \(t\), the log price target is \(y_{t,k}\), the feature vector is \(X_{t,k}\), the coefficient vector is \(\beta_t\), and the residual is \(\varepsilon_{t,k}\).
 
 The fitted pricing equation is
 
@@ -1289,79 +1007,49 @@ The pricing residual is the part of the market price not explained by fundamenta
 
 The feature set is economically meaningful, but the variables are not independent. Yield affects production. Production affects ending stocks. Ending stocks affect stocks to use. Stocks to use affects the balance factor. Ordinary least squares can therefore become unstable because related variables move together.
 
-The ordinary least squares objective chooses coefficients that minimize historical squared pricing errors. For observation
-
-$$
-i,
-$$
-
-the model prediction is
-
-$$
-\hat{y}_i = X_i^{\top}\beta.
-$$
+The ordinary least squares objective chooses coefficients that minimize historical squared pricing errors. For observation \(i\), the model prediction is \(\hat{y}_i = X_i^{\top}\beta\).
 
 The pricing error is actual log price minus fitted log price:
 
 $$
-e_i = y_i − \hat{y}_i.
+e_i = y_i - \hat{y}_i.
 $$
 
 Substituting the fitted value gives
 
 $$
-e_i = y_i − X_i^{\top}\beta.
+e_i = y_i - X_i^{\top}\beta.
 $$
 
 A positive and a negative error should not cancel each other out, so the error is squared:
 
 $$
-e_i^2 = \left(y_i − X_i^{\top}\beta\right)^2.
+e_i^2 = \left(y_i - X_i^{\top}\beta\right)^2.
 $$
 
-At date
-
-$$
-t,
-$$
-
-the training set contains only observations before date
-
-$$
-t.
-$$
+At date \(t\), the training set contains only observations before date \(t\).
 
 The total historical squared pricing error is therefore
 
 $$
-\sum_{i<t}\left(y_i − X_i^{\top}\beta\right)^2.
+\sum_{i<t}\left(y_i - X_i^{\top}\beta\right)^2.
 $$
 
 Ordinary least squares chooses the coefficient vector that minimizes this total squared error:
 
 $$
-\hat{\beta}^{\text{OLS}}_t = \arg\min_{\beta}\sum_{i<t}\left(y_i − X_i^{\top}\beta\right)^2.
+\hat{\beta}^{\text{OLS}}_t = \arg\min_{\beta}\sum_{i<t}\left(y_i - X_i^{\top}\beta\right)^2.
 $$
 
 The problem is that correlated features can make ordinary least squares coefficients unstable. The model may fit historical prices by using large offsetting coefficients even when those coefficients are not economically reliable.
 
-Ridge regression addresses this by adding a cost for large coefficients. For
-
-$$
-p
-$$
-
-features, total coefficient size is measured by the sum of squared coefficients:
+Ridge regression addresses this by adding a cost for large coefficients. For \(p\) features, total coefficient size is measured by the sum of squared coefficients:
 
 $$
 \sum_{j=1}^{p}\beta_j^2.
 $$
 
-The strength of the penalty is controlled by the shrinkage parameter
-
-$$
-\lambda.
-$$
+The strength of the penalty is controlled by the shrinkage parameter \(\lambda\).
 
 The ridge penalty is
 
@@ -1372,73 +1060,29 @@ $$
 The ridge objective combines historical pricing error and coefficient shrinkage:
 
 $$
-\hat{\beta}_t = \arg\min_{\beta}\left[\sum_{i<t}\left(y_i − X_i^{\top}\beta\right)^2 + \lambda\sum_{j=1}^{p}\beta_j^2\right].
+\hat{\beta}_t = \arg\min_{\beta}\left[\sum_{i<t}\left(y_i - X_i^{\top}\beta\right)^2 + \lambda\sum_{j=1}^{p}\beta_j^2\right].
 $$
 
-The first term rewards fit. The second term rewards coefficient stability. A larger
-
-$$
-\lambda
-$$
-
-creates stronger shrinkage, while a smaller
-
-$$
-\lambda
-$$
-
-makes the model closer to ordinary least squares.
+The first term rewards fit. The second term rewards coefficient stability. A larger \(\lambda\) creates stronger shrinkage, while a smaller \(\lambda\) makes the model closer to ordinary least squares.
 
 The goal is not only to fit historical prices. The goal is to estimate stable contract level relationships that can be used out of sample.
 
 ## No lookahead training logic
 
-At date
+At date \(t\), the model must not use date \(t\) market price to train the coefficient that prices date \(t\).
 
-$$
-t,
-$$
-
-the model must not use date
-
-$$
-t
-$$
-
-market price to train the coefficient that prices date
-
-$$
-t.
-$$
-
-The training set available at date
-
-$$
-t
-$$
-
-contains only earlier observations:
+The training set available at date \(t\) contains only earlier observations:
 
 $$
 \text{TrainingSet}_t = \{(X_i,y_i):i<t\}.
 $$
 
-The coefficient vector available for the current prediction is therefore the coefficient estimated from past data:
+The coefficient vector available for the current prediction is therefore the coefficient estimated from past data, \(\hat{\beta}_{t-1}\).
+
+The current fair log price for contract \(k\) is computed by applying those past estimated coefficients to today’s feature vector:
 
 $$
-\hat{\beta}_{t−1}.
-$$
-
-The current fair log price for contract
-
-$$
-k
-$$
-
-is computed by applying those past estimated coefficients to today’s feature vector:
-
-$$
-\hat{y}_{t,k} = X_{t,k}^{\top}\hat{\beta}_{t−1}.
+\hat{y}_{t,k} = X_{t,k}^{\top}\hat{\beta}_{t-1}.
 $$
 
 Only after the trading decision is made can today’s observation be added to the training set:
@@ -1451,17 +1095,7 @@ This prevents the current market price from contaminating the current fair value
 
 ## From fitted log price to fair value
 
-The model estimates fair value in log space. The fitted log price for contract
-
-$$
-k
-$$
-
-is
-
-$$
-\hat{y}_{t,k}.
-$$
+The model estimates fair value in log space. The fitted log price for contract \(k\) is \(\hat{y}_{t,k}\).
 
 The original price scale is recovered by exponentiating the fitted log price:
 
@@ -1483,22 +1117,12 @@ $$
 
 ## Pricing residual
 
-Because the model is estimated in log space, the pricing residual is also measured in log space. The market log price is
-
-$$
-\ln(F^{\text{market}}_{t,k}),
-$$
-
-and the fitted fair log price is
-
-$$
-\hat{y}_{t,k}.
-$$
+Because the model is estimated in log space, the pricing residual is also measured in log space. The market log price is \(\ln(F^{\text{market}}_{t,k})\), and the fitted fair log price is \(\hat{y}_{t,k}\).
 
 The residual is market log price minus fitted fair log price:
 
 $$
-\text{Residual}_{t,k} = \ln(F^{\text{market}}_{t,k}) − \hat{y}_{t,k}.
+\text{Residual}_{t,k} = \ln(F^{\text{market}}_{t,k}) - \hat{y}_{t,k}.
 $$
 
 A positive residual means the contract is expensive relative to the fitted model. A negative residual means the contract is cheap relative to the fitted model.
@@ -1507,13 +1131,7 @@ A positive residual means the contract is expensive relative to the fitted model
 
 A residual is not tradable until it is scaled by uncertainty. A two cent residual may be large in a quiet regime and irrelevant in a volatile regime. The model therefore estimates the historical residual scale using only past residuals.
 
-Let the residual standard deviation available at date
-
-$$
-t
-$$
-
-be
+Let the residual standard deviation available at date \(t\) be
 
 $$
 \hat{\sigma}_{\text{resid},t} = \text{Std}\left(\text{Residual}_i\right), \qquad i<t.
@@ -1529,34 +1147,22 @@ This z score is the bridge from valuation to trading.
 
 ## Calendar spread fair value
 
-The same fitted contract fair values can be used to value calendar spreads. For near contract
+The same fitted contract fair values can be used to value calendar spreads. For near contract \(n\) and far contract \(f\), the observed market spread is
 
 $$
-n
-$$
-
-and far contract
-
-$$
-f,
-$$
-
-the observed market spread is
-
-$$
-\text{MarketSpread}_t = F^{\text{market}}_{t,n} − F^{\text{market}}_{t,f}.
+\text{MarketSpread}_t = F^{\text{market}}_{t,n} - F^{\text{market}}_{t,f}.
 $$
 
 The model implied fair spread is built from the fitted fair values of the two legs:
 
 $$
-\text{FairSpread}_t = \text{FairValue}_{t,n} − \text{FairValue}_{t,f}.
+\text{FairSpread}_t = \text{FairValue}_{t,n} - \text{FairValue}_{t,f}.
 $$
 
 The spread error is the observed market spread minus the fitted fair spread:
 
 $$
-\text{SpreadError}_t = \text{MarketSpread}_t − \text{FairSpread}_t.
+\text{SpreadError}_t = \text{MarketSpread}_t - \text{FairSpread}_t.
 $$
 
 The spread error must be scaled by spread uncertainty. The first implementation approximates spread uncertainty from leg uncertainty and imposes a minimum floor to avoid treating tiny denominators as high confidence signals:
@@ -1584,7 +1190,7 @@ $$
 If the pricing z score is negative, the market price is below fitted fair value and the contract is cheap relative to the model. A sufficiently negative z score creates a long signal:
 
 $$
-\text{PricingZ}_{t,k} < −0.90.
+\text{PricingZ}_{t,k} < -0.90.
 $$
 
 The exit rule is based on normalization. Once the absolute pricing z score falls below the exit threshold, the mispricing is no longer large enough to justify the position:
@@ -1604,7 +1210,7 @@ $$
 If the spread z score is negative, the market spread is below fitted fair spread. The near contract is cheap relative to the far contract, so the strategy buys the near leg and shorts the far leg:
 
 $$
-\text{SpreadZ}_t < −0.70.
+\text{SpreadZ}_t < -0.70.
 $$
 
 The spread exits when the absolute spread z score falls below the normalization threshold:
@@ -1631,29 +1237,9 @@ The spread does not need to have a larger score than the outright. It only needs
 
 ## Position sizing and risk control
 
-The first implementation uses simple fixed contract sizing. For an outright trade, the unit is
+The first implementation uses simple fixed contract sizing. For an outright trade, the unit is \(1\text{ contract}\). For a spread trade, the unit is \(1\text{ contract per leg}\).
 
-$$
-1\text{ contract}.
-$$
-
-For a spread trade, the unit is
-
-$$
-1\text{ contract per leg}.
-$$
-
-A more general sizing rule should connect position size to signal strength and uncertainty. Signal strength is measured by the absolute z score,
-
-$$
-|Z_t|,
-$$
-
-while model uncertainty is represented by residual error scale, volatility, or another risk estimate:
-
-$$
-\text{ModelUncertainty}_t.
-$$
+A more general sizing rule should connect position size to signal strength and uncertainty. Signal strength is measured by the absolute z score, \(|Z_t|\), while model uncertainty is represented by residual error scale, volatility, or another risk estimate, \(\text{ModelUncertainty}_t\).
 
 The desired position size should rise with signal strength and fall with uncertainty:
 
@@ -1679,48 +1265,30 @@ $$
 
 ## Backtest setup
 
-The first backtest covered the period from
-
-$$
-2022
-$$
-
-to
-
-$$
-2024.
-$$
+The first backtest covered the period from \(2022\) to \(2024\).
 
 The specific start date was January 5, 2022, and the specific end date was April 23, 2024.
 
-Initial capital was
+Initial capital was \(250{,}000\text{ USD}\).
 
-$$
-250{,}000\text{ USD}.
-$$
-
-Ending equity was
-
-$$
-248{,}352.10\text{ USD}.
-$$
+Ending equity was \(248{,}352.10\text{ USD}\).
 
 Net profit is ending equity minus starting equity:
 
 $$
-248{,}352.10 − 250{,}000 = −1{,}647.90\text{ USD}.
+248{,}352.10 - 250{,}000 = -1{,}647.90\text{ USD}.
 $$
 
 The percentage return is net profit divided by starting capital:
 
 $$
-\frac{−1{,}647.90}{250{,}000} = −0.0065916.
+\frac{-1{,}647.90}{250{,}000} = -0.0065916.
 $$
 
 Converting to percent gives
 
 $$
-−0.0065916 \times 100 \approx −0.66\%.
+-0.0065916 \times 100 \approx -0.66\%.
 $$
 
 The backtest summary is:
@@ -1729,8 +1297,8 @@ The backtest summary is:
 <tr><th>Metric</th><th>Value</th></tr>
 <tr><td>Start equity</td><td>250,000.00 USD</td></tr>
 <tr><td>End equity</td><td>248,352.10 USD</td></tr>
-<tr><td>Net profit</td><td>−1,647.90 USD</td></tr>
-<tr><td>Return</td><td>−0.66%</td></tr>
+<tr><td>Net profit</td><td>-1,647.90 USD</td></tr>
+<tr><td>Return</td><td>-0.66%</td></tr>
 <tr><td>Total fees</td><td>172.90 USD</td></tr>
 <tr><td>Total orders</td><td>70</td></tr>
 <tr><td>Closed trades</td><td>35</td></tr>
@@ -1740,7 +1308,7 @@ The backtest summary is:
 <tr><td>Loss rate</td><td>37.14%</td></tr>
 <tr><td>Profit factor</td><td>0.8742</td></tr>
 <tr><td>Drawdown</td><td>1.600%</td></tr>
-<tr><td>Sharpe ratio</td><td>−3.246</td></tr>
+<tr><td>Sharpe ratio</td><td>-3.246</td></tr>
 <tr><td>Probabilistic Sharpe ratio</td><td>1.606%</td></tr>
 </table>
 
@@ -1750,25 +1318,7 @@ The backtest summary is:
 
 ## Backtest interpretation
 
-The backtest produced
-
-$$
-35
-$$
-
-closed trades. Of those,
-
-$$
-22
-$$
-
-were winners and
-
-$$
-13
-$$
-
-were losers. The win rate is winners divided by total closed trades:
+The backtest produced \(35\) closed trades. Of those, \(22\) were winners and \(13\) were losers. The win rate is winners divided by total closed trades:
 
 $$
 \text{WinRate} = \frac{22}{35}.
@@ -1780,25 +1330,11 @@ $$
 \text{WinRate} = 0.6286 = 62.86\%.
 $$
 
-A win rate above
+A win rate above \(50\%\) suggests that the signal is not directionally useless. However, profitability depends on both win frequency and payoff size.
 
-$$
-50\%
-$$
+The average winning trade was \(\text{AverageWin} = 465.91\text{ USD}\).
 
-suggests that the signal is not directionally useless. However, profitability depends on both win frequency and payoff size.
-
-The average winning trade was
-
-$$
-\text{AverageWin} = 465.91\text{ USD}.
-$$
-
-The average losing trade was
-
-$$
-\text{AverageLoss} = −901.92\text{ USD}.
-$$
+The average losing trade was \(\text{AverageLoss} = -901.92\text{ USD}\).
 
 The payoff ratio compares the average win with the absolute average loss:
 
@@ -1808,16 +1344,12 @@ $$
 
 The average winner was only about half the size of the average loser.
 
-Expected profit and loss per trade can be approximated from win probability, loss probability, average win, and average loss. The probability of a win is
-
-$$
-P(\text{win}) = 0.6286.
-$$
+Expected profit and loss per trade can be approximated from win probability, loss probability, average win, and average loss. The probability of a win is \(P(\text{win}) = 0.6286\).
 
 The probability of a loss is
 
 $$
-P(\text{loss}) = 1 − 0.6286 = 0.3714.
+P(\text{loss}) = 1 - 0.6286 = 0.3714.
 $$
 
 The expected trade profit and loss is
@@ -1829,7 +1361,7 @@ $$
 Substituting the observed values gives
 
 $$
-E[\text{PnL}] = 0.6286\cdot465.91 + 0.3714\cdot(−901.92).
+E[\text{PnL}] = 0.6286\cdot465.91 + 0.3714\cdot(-901.92).
 $$
 
 The winning contribution is approximately
@@ -1841,13 +1373,13 @@ $$
 The losing contribution is approximately
 
 $$
-0.3714\cdot(−901.92) \approx −335.00.
+0.3714\cdot(-901.92) \approx -335.00.
 $$
 
 The expected trade is therefore
 
 $$
-E[\text{PnL}] \approx 292.80 − 335.00 = −42.20\text{ USD}.
+E[\text{PnL}] \approx 292.80 - 335.00 = -42.20\text{ USD}.
 $$
 
 The main weakness is not the win rate. The main weakness is payoff asymmetry. The current strategy wins more often than it loses, but when it loses, it loses too much.
@@ -1883,4 +1415,3 @@ $$
 $$
 
 The next research priority should therefore be risk side improvement: better exits, volatility aware stops, direct spread uncertainty estimation, event risk controls, and uncertainty adjusted position sizing.
-
